@@ -1,1 +1,17 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": ["XXXXXXXXXX.com.nakanoya.PediGreeN"],
+        "components": [
+          {
+            "/": "/p/*",
+            "comment": "PG-pass transfer links"
+          }
+        ]
+      }
+    ]
+  }
+}
 
