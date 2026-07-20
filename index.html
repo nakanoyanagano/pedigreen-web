@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PediGreeN - 植物育種管理アプリ</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, sans-serif; background: #f5f5f7; color: #1d1d1f; }
+    .hero { background: linear-gradient(135deg, #1a472a, #2d7a4f); color: white; padding: 60px 24px; text-align: center; }
+    .hero h1 { font-size: 2.4rem; font-weight: 700; margin-bottom: 12px; }
+    .hero p { font-size: 1.1rem; opacity: 0.85; max-width: 500px; margin: 0 auto 32px; }
+    .badge { display: inline-block; }
+    .badge img { height: 52px; }
+    .features { max-width: 800px; margin: 48px auto; padding: 0 24px; }
+    .features h2 { font-size: 1.6rem; font-weight: 600; margin-bottom: 24px; text-align: center; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+    .card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+    .card .icon { font-size: 2rem; margin-bottom: 12px; }
+    .card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 6px; }
+    .card p { font-size: 0.875rem; color: #6e6e73; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <h1>🌿 PediGreeN</h1>
+    <p>植物育種家のための系譜・栽培管理アプリ。血統・作業記録・ラベル印刷をひとつに。</p>
+    <a class="badge" href="https://apps.apple.com/jp/app/pedigreen/id000000000">
+      <img src="https://developer.apple.com/app-store/marketing/guidelines/images/badge-download-on-the-app-store.svg" alt="Download on the App Store">
+    </a>
+  </div>
+  <div class="features">
+    <h2>主な機能</h2>
+    <div class="grid">
+      <div class="card"><div class="icon">🌳</div><h3>系譜ツリー</h3><p>5世代の血統をビジュアルで管理。交配記録を自動でツリー化。</p></div>
+      <div class="card"><div class="icon">📸</div><h3>成長記録</h3><p>複数写真＋比較撮影で成長を記録。作業履歴も一元管理。</p></div>
+      <div class="card"><div class="icon">🏷</div><h3>QRラベル印刷</h3><p>P-TOUCHプリンターでQRコード付きラベルを印刷。</p></div>
+      <div class="card"><div class="icon">🔗</div><h3>PG-pass</h3><p>個体情報・系譜・栽培記録をURLひとつで安全に譲渡。</p></div>
+    </div>
+  </div>
+</body>
+</html>
