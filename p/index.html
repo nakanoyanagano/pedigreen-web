@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PG-pass - PediGreeN</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, sans-serif; background: #f5f5f7; color: #1d1d1f; }
+    .container { max-width: 480px; margin: 0 auto; padding: 24px; }
+    .header { text-align: center; padding: 40px 0 24px; }
+    .header .logo { font-size: 3rem; margin-bottom: 8px; }
+    .header h1 { font-size: 1.4rem; font-weight: 600; color: #1a472a; }
+    .header p { font-size: 0.9rem; color: #6e6e73; margin-top: 6px; }
+    .card { background: white; border-radius: 20px; padding: 24px; box-shadow: 0 2px 16px rgba(0,0,0,0.08); margin-bottom: 16px; }
+    .plant-image { width: 100%; max-height: 280px; object-fit: cover; border-radius: 12px; margin-bottom: 16px; display: none; }
+    .plant-name { font-size: 1.4rem; font-weight: 700; margin-bottom: 4px; }
+    .plant-id { font-size: 0.85rem; color: #6e6e73; font-family: monospace; margin-bottom: 16px; }
+    .row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; }
+    .row:last-child { border-bottom: none; }
+    .row .label { color: #6e6e73; }
+    .row .value { font-weight: 500; text-align: right; max-width: 60%; }
+    .genealogy { display: flex; gap: 8px; margin-top: 8px; }
+    .parent { flex: 1; background: #f5f5f7; border-radius: 10px; padding: 10px; text-align: center; font-size: 0.8rem; }
+    .parent .role { color: #6e6e73; font-size: 0.7rem; margin-bottom: 2px; }
+    .badge-row { display: flex; gap: 12px; align-items: center; padding: 8px 0; }
+    .badge-row .icon { font-size: 1.2rem; }
+    .badge-row .text { font-size: 0.85rem; color: #6e6e73; }
+    .expiry { font-size: 0.75rem; color: #6e6e73; text-align: center; margin: 8px 0 16px; }
+    .btn-open { display: block; width: 100%; background: #1a472a; color: white; border: none; border-radius: 14px; padding: 16px; font-size: 1rem; font-weight: 600; text-align: center; text-decoration: none; margin-bottom: 12px; cursor: pointer; }
+    .btn-store { display: block; text-align: center; margin: 0 auto; }
+    .btn-store img { height: 44px; }
+    .loading { text-align: center; padding: 60px 24px; color: #6e6e73; }
+    .error { text-align: center; padding: 40px 24px; }
+    .error .icon { font-size: 3rem; margin-bottom: 12px; }
+    .error h2 { font-size: 1.2rem; margin-bottom: 8px; }
+    .error p { font-size: 0.9rem; color: #6e6e73; }
+    .security { display: flex; align-items: center; gap: 8px; background: #f0faf4; border-radius: 10px; padding: 10px 14px; margin-top: 8px; }
+    .security span { font-size: 0.8rem; color: #1a472a; }
+    #content { display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">🌿</div>
+      <h1>PG-pass</h1>
+      <p>PediGreeN 個体情報の受け渡し</p>
+    </div>
+
+    <div id="loading" class="loading">
+      <p>データを読み込み中...</p>
+    </div>
+
+    <div id="error" class="error" style="display:none;">
+      <div class="icon">⚠️</div>
+      <h2 id="error-title">リンクが無効です</h2>
+      <p id="error-message">このPG-passリンクは有効期限が切れているか、存在しません。</p>
+    </div>
+
+    <div id="content">
+      <div class="card">
+        <img id="plant-image" class="plant-image" alt="植物写真">
+        <div id="plant-name" class="plant-name"></div>
+        <div id="plant-id" class="plant-id"></div>
+        <div id="plant-rows"></div>
+
+        <div class="security">
+          <span>🔒</span>
+          <span>Apple IDで署名・改ざん防止済み</span>
+        </div>
+      </div>
+
+      <div id="genealogy-card" class="card" style="display:none;">
+        <div style="font-size:0.85rem;color:#6e6e73;margin-bottom:8px;">系譜</div>
+        <div class="genealogy">
+          <div id="father-block" class="parent" style="display:none;">
+            <div class="role">♂ 父</div>
+            <div id="father-name"></div>
+          </div>
+          <div id="mother-block" class="parent" style="display:none;">
+            <div class="role">♀ 母</div>
+            <div id="mother-name"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="font-size:0.85rem;color:#6e6e73;margin-bottom:10px;">含まれるデータ</div>
+        <div id="includes"></div>
+        <div id="expiry" class="expiry"></div>
+      </div>
+
+      <a id="btn-open" class="btn-open" href="#">PediGreeNで取り込む</a>
+      <a class="btn-store" href="https://apps.apple.com/jp/app/pedigreen/id000000000">
+        <img src="https://developer.apple.com/app-store/marketing/guidelines/images/badge-download-on-the-app-store.svg" alt="App Store">
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // CloudKit JS SDK
+    const CONTAINER = 'iCloud.com.nakanoya.PediGreeN';
+    const ENV = 'production';
+    const TOKEN = 'CLOUDKIT_WEB_TOKEN'; // CloudKit Consoleで取得
+
+    const transferId = location.pathname.split('/').pop();
+    if (!transferId) showError('IDが見つかりません', '');
+
+    async function load() {
+      try {
+        const res = await fetch(
+          `https://api.apple-cloudkit.com/database/1/${CONTAINER}/${ENV}/public/records/lookup`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              operationType: 'query',
+              zoneID: { zoneName: '_defaultZone' },
+              query: {
+                recordType: 'PGPassRecord',
+                filterBy: [{
+                  fieldName: 'transferId',
+                  fieldValue: { value: transferId, type: 'STRING' },
+                  comparator: 'EQUALS'
+                }]
+              },
+              resultsLimit: 1,
+              requestIDs: ['token', TOKEN]
+            })
+          }
+        );
+        const json = await res.json();
+        const records = json.records || [];
+        if (!records.length) return showError('リンクが無効です', 'このPG-passリンクは存在しません。');
+
+        const fields = records[0].fields;
+
+        // 有効期限チェック
+        const expires = new Date(fields.expiresAt.value);
+        if (expires < new Date()) return showError('有効期限切れ', 'このPG-passリンクの有効期限が切れています。');
+
+        // アセット取得
+        const assetURL = fields.plantAsset?.value?.downloadURL;
+        let plantData = null;
+        if (assetURL) {
+          const assetRes = await fetch(assetURL);
+          plantData = await assetRes.json();
+        }
+
+        render(plantData, expires);
+      } catch(e) {
+        showError('読み込みエラー', 'データの取得に失敗しました。');
+      }
+    }
+
+    function render(data, expires) {
+      const p = data?.plant || {};
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+
+      // 写真
+      if (p.mainImageData) {
+        const img = document.getElementById('plant-image');
+        img.src = 'data:image/jpeg;base64,' + p.mainImageData;
+        img.style.display = 'block';
+      }
+
+      document.getElementById('plant-name').textContent = p.cultivar || p.idCode || '---';
+      document.getElementById('plant-id').textContent = p.idCode;
+
+      // 基本情報
+      const rows = [];
+      if (p.scientificName) rows.push(['学名', p.scientificName]);
+      if (p.derivationType) rows.push(['由来区分', p.derivationType]);
+      if (p.sourceName)     rows.push(['入手先', p.sourceName]);
+      if (p.rating > 0)     rows.push(['評価', '★'.repeat(p.rating)]);
+      if (p.tags?.length)   rows.push(['タグ', p.tags.map(t => '#'+t).join(' ')]);
+
+      document.getElementById('plant-rows').innerHTML = rows
+        .map(([l,v]) => `<div class="row"><span class="label">${l}</span><span class="value">${v}</span></div>`)
+        .join('');
+
+      // 系譜
+      if (p.fatherCultivar || p.motherCultivar) {
+        document.getElementById('genealogy-card').style.display = 'block';
+        if (p.fatherCultivar) {
+          document.getElementById('father-block').style.display = 'block';
+          document.getElementById('father-name').textContent = p.fatherCultivar;
+        }
+        if (p.motherCultivar) {
+          document.getElementById('mother-block').style.display = 'block';
+          document.getElementById('mother-name').textContent = p.motherCultivar;
+        }
+      }
+
+      // 含まれるデータ
+      const inc = ['✅ 基本情報・系譜'];
+      if (data.includeActions) inc.push(`✅ 作業記録 ${p.actions?.length || 0}件`);
+      if (data.includeGallery) inc.push(`✅ 写真 ${p.photos?.length || 0}枚`);
+      document.getElementById('includes').innerHTML = inc
+        .map(i => `<div class="badge-row"><span>${i}</span></div>`).join('');
+
+      // 有効期限
+      document.getElementById('expiry').textContent =
+        `有効期限: ${expires.toLocaleDateString('ja-JP')}`;
+
+      // アプリ起動URL
+      document.getElementById('btn-open').href =
+        `https://pedigreen.app/p/${transferId}`;
+    }
+
+    function showError(title, msg) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('error').style.display = 'block';
+      document.getElementById('error-title').textContent = title;
+      document.getElementById('error-message').textContent = msg;
+    }
+
+    load();
+  </script>
+</body>
+</html>
