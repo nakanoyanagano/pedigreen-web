@@ -101,8 +101,12 @@
   <script>
     // CloudKit JS SDK
     const CONTAINER = 'iCloud.com.nakanoya.PediGreeN';
-    const ENV = 'production';
-    const TOKEN = 'CLOUDKIT_WEB_TOKEN'; // CloudKit Consoleで取得
+    // 環境切り替え:
+    //   開発中     → 'development'（Xcodeデバッグ実行のアプリが保存する環境）
+    //   公開・本番 → 'production'（App Store配信版・TestFlight版が保存する環境）
+    // ⚠️ 公開前に必ず 'production' に戻すこと
+    const ENV = 'development';
+    const TOKEN = '1bfb94e5b6ef822caa1b9637bd6d0086ea40e7e14f03ac060ad0e83f7fb132b7'; // CloudKit Console (API Access) で取得
 
     const params = new URLSearchParams(location.search);
     const transferId = params.get('id');
