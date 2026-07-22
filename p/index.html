@@ -92,6 +92,9 @@
       </div>
 
       <a id="btn-open" class="btn-open" href="#">PediGreeNで取り込む</a>
+      <p style="text-align:center;font-size:0.75rem;color:#6e6e73;margin:-4px 0 12px;">
+        アプリが開かない場合は、画面上部の「開く」をタップしてください
+      </p>
       <a class="btn-store" href="https://apps.apple.com/jp/app/pedigreen/id000000000">
         <img src="https://developer.apple.com/app-store/marketing/guidelines/images/badge-download-on-the-app-store.svg" alt="App Store">
       </a>
@@ -214,7 +217,7 @@
 
       // アプリ起動URL
       document.getElementById('btn-open').href =
-        `https://nakanoyanagano.github.io/pedigreen-web/p/${transferId}`;
+        `https://nakanoyanagano.github.io/pedigreen-web/p/?id=${transferId}`;
     }
 
     function showError(title, msg) {
