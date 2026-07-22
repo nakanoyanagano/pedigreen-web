@@ -1,17 +1,15 @@
 {
   "applinks": {
-    "apps": [],
     "details": [
       {
-        "appIDs": ["XXXXXXXXXX.com.nakanoya.PediGreeN"],
+        "appIDs": ["34AUVW4ACR.com.nakanoya.PediGreeN"],
         "components": [
           {
-            "/": "/p/*",
-            "comment": "PG-pass transfer links"
+            "/": "/pedigreen-web/p/*",
+            "comment": "PG-pass 個体情報の受け渡しリンク"
           }
         ]
       }
     ]
   }
 }
-
