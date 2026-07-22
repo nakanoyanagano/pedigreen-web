@@ -115,12 +115,11 @@
     async function load() {
       try {
         const res = await fetch(
-          `https://api.apple-cloudkit.com/database/1/${CONTAINER}/${ENV}/public/records/lookup`,
+          `https://api.apple-cloudkit.com/database/1/${CONTAINER}/${ENV}/public/records/query?ckAPIToken=${TOKEN}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              operationType: 'query',
               zoneID: { zoneName: '_defaultZone' },
               query: {
                 recordType: 'PGPassRecord',
@@ -130,12 +129,15 @@
                   comparator: 'EQUALS'
                 }]
               },
-              resultsLimit: 1,
-              requestIDs: ['token', TOKEN]
+              resultsLimit: 1
             })
           }
         );
         const json = await res.json();
+        if (json.serverErrorCode) {
+          console.error('CloudKit error:', json.serverErrorCode, json.reason);
+          return showError('読み込みエラー', 'データの取得に失敗しました。');
+        }
         const records = json.records || [];
         if (!records.length) return showError('リンクが無効です', 'このPG-passリンクは存在しません。');
 
